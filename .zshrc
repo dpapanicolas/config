@@ -93,6 +93,6 @@ export PATH="$PATH:$HOME/.rvm/bin:$HOME/Library/Python/3.6/bin"
 export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 export PATH="/Library/Tex/texbin:$PATH"
 
-# fzf via Homebrew
+# fzf via github
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
