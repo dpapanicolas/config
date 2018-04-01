@@ -105,12 +105,23 @@ vnoremap <space> zf
 " nmap <C-l> <C-W>l
 
 "Search for the word under the cursor in the current directory
-nmap <M-k>    mo:Ack! "\b<cword>\b" <CR>
-nmap <Esc>k   mo:Ack! "\b<cword>\b" <CR>
-nmap \*        mo:Ack! "\b<cword>\b" <CR>
-nmap <M-S-k>  mo:Ggrep! "\b<cword>\b" <CR>
-nmap <Esc>K   mo:Ggrep! "\b<cword>\b" <CR>
+"
+"
+"
+function Search() abort
+  let saved_shellpipe = &shellpipe
+    let &shellpipe =  '>'
+      try
+        execute 'Ack!' "<cword>"
+      finally
+        let &shellpipe = saved_shellpipe
+      endtry
+endfunction
 
+
+nmap <M-k>    :call Search()<CR>
+nmap <Esc>k   :call Search()<CR>
+nmap \*       :call Search()<CR>
 
 " These are things that I mistype and want ignored.
 nmap Q  <silent>
@@ -153,7 +164,26 @@ Plug 'itchyny/lightline.vim'
 Plug 'tpope/vim-commentary'
 Plug 'flazz/vim-colorschemes'
 
+Plug 'valloric/youcompleteme'
+
 call plug#end()
+
+"vimtex
+let g:vimtex_view_method = "skim"
+let g:vimtex_complete_enabled = 1
+"Too slow so turn this off
+let g:vimtex_matchparen_enabled = 0
+
+
+if !exists('g:ycm_semantic_triggers')
+    let g:ycm_semantic_triggers = {}
+endif
+let g:ycm_semantic_triggers.tex = g:vimtex#re#youcompleteme
+let g:ycm_max_num_candidates = 20
+"Effectively kilz
+let g:ycm_min_num_of_chars_for_completion = 20
+
+
 
 "Remap the buffers command
 nmap ; :Buffers<CR>
@@ -163,14 +193,15 @@ nmap \f :Files<CR>
 if executable('ag')
   let g:ackprg = 'ag --vimgrep'
 endif
-
-
-
 " " ALE
 let g:ale_sign_column_always = 1
 let g:ale_sign_warning = '▲'
 let g:ale_sign_error = 'X'
-"let g:ale_lint_on_text_change = 'never'
+let g:ale_completion_enable=0
+let g:ale_lint_on_text_change = 'normal'
+let g_ale_lint_delay=300 "After a second run it
+
+
 highlight link ALEWarningSign String
 highlight link ALEErrorSign Error
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
@@ -221,22 +252,6 @@ function! LightlineLinterOK() abort
   let l:all_non_errors = l:counts.total - l:all_errors
   return l:counts.total == 0 ? '✓' : ''
 endfunction
-
-
-"" ---
-" Tmux rebinds
-" ----
-
-function TmuxPaneRepeat()
-  write
-  silent execute ':!tmux send-keys -t' g:tmux_console_pane 'C-p' 'C-j'
-  redraw!
-endfunction
-function TmuxPaneClear()
-  silent execute ':!tmux send-keys -t' g:tmux_server_pane 'C-j' 'C-j' 'C-j' 'C-j' 'C-j' 'C-j' 'C-j'
-  redraw!
-endfunction
-
 
 " ----------------------------------------------------------------------------
 " COLORS
@@ -293,7 +308,7 @@ highlight clear MatchParen
 highlight link MatchParen Search
 
 " Make trailing spaces very visible
-highlight SpecialKey ctermbg=Yellow guibg=Yellow 
+highlight SpecialKey ctermbg=Yellow guibg=Yellow
 
 " ----------------------------------------------------------------------------
 " FILE TYPE TRIGGERS
@@ -327,6 +342,7 @@ au BufNewFile,BufRead *.zone    setlocal nolist ts=4 sw=4 noet
 au BufNewFile,BufRead *.zsh     setf zsh
 au BufNewFile,BufRead *.text    setlocal nolist spell
 au BufNewFile,BufRead *.tex    setlocal nolist spell
+au BufNewFile,BufRead *.tex   let b:ale_enabled = 0
 au BufNewFile,BufRead *templates/*.html setf htmldjango
 au BufNewFile,BufRead .git/config setlocal ft=gitconfig nolist ts=4 sw=4 noet
 au BufNewFile,BufRead .gitconfig* setlocal ft=gitconfig nolist ts=4 sw=4 noet

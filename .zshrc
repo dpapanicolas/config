@@ -87,6 +87,7 @@ source $ZSH/oh-my-zsh.sh
 
 #alias python="jupyter console"
 alias grc="gnuradio-companion"
+alias vim="/opt/local/bin/vim --servername vim"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin:$HOME/Library/Python/3.6/bin"
@@ -95,4 +96,6 @@ export PATH="/Library/Tex/texbin:$PATH"
 
 # fzf via github
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+
 
